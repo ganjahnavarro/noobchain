@@ -8,6 +8,7 @@ public class Block {
 	private String previousHash;
 	private String data; // our data will be a simple message.
 	private long timeStamp; // as number of milliseconds since 1/1/1970.
+	private int nonce;
 
 	// Block Constructor.
 	public Block(String data, String previousHash) {
@@ -18,7 +19,20 @@ public class Block {
 	}
 
 	public String calculateHash() {
-		return StringUtil.applySha256(previousHash + Long.toString(timeStamp) + data);
+		return StringUtil.applySha256(previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + data);
+	}
+
+	public void mineBlock(int difficulty) {
+		long miningStart = System.currentTimeMillis();
+
+		String target = new String(new char[difficulty]).replace('\0', '0'); // Create a string with difficulty * "0"
+		while (!hash.substring(0, difficulty).equals(target)) {
+			nonce++;
+			hash = calculateHash();
+		}
+
+		long duration = System.currentTimeMillis() - miningStart;
+		System.out.println("Block mined. Duration: " + duration + "ms. Hash: " + hash);
 	}
 
 	public String getHash() {
