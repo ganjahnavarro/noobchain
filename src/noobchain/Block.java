@@ -2,6 +2,8 @@ package noobchain;
 
 import java.util.Date;
 
+import noobchain.util.StringUtil;
+
 public class Block {
 
 	private String hash;

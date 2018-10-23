@@ -1,16 +1,46 @@
 package noobchain;
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import com.google.gson.GsonBuilder;
+
+import noobchain.tx.Transaction;
+import noobchain.util.StringUtil;
 
 public class NoobChain {
 
 	private static List<Block> blockchain = new ArrayList<Block>();
 	private static int difficulty = 5;
 
+	private static Wallet walletA;
+	private static Wallet walletB;
+
 	public static void main(String[] args) {
+		// Setup Bouncy castle as a Security Provider
+		Security.addProvider(new BouncyCastleProvider());
+		
+		// Create the new wallets
+		walletA = new Wallet();
+		walletB = new Wallet();
+		
+		// Test public and private keys
+		System.out.println("Private and public keys:");
+		System.out.println(StringUtil.getStringFromKey(walletA.getPrivateKey()));
+		System.out.println(StringUtil.getStringFromKey(walletA.getPublicKey()));
+		
+		// Create a test transaction from WalletA to walletB
+		Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(), 5, null);
+		transaction.generateSignature(walletA.getPrivateKey());
+
+		// Verify the signature works and verify it from the public key
+		System.out.println("Signature verified: " + transaction.verifiySignature());
+	}
+
+	public static void basicDemo() {
 		// add our blocks to the blockchain list
 		blockchain.add(new Block("Hi im the first block", "0"));
 		System.out.println("Trying to Mine block 1..");
