@@ -11,10 +11,10 @@ public class Block {
 
 	private String hash;
 	private String previousHash;
-	
+
 	private String merkleRoot;
 	private List<Transaction> transactions = new ArrayList<Transaction>();
-	
+
 	private long timeStamp; // as number of milliseconds since 1/1/1970.
 	private int nonce;
 
@@ -43,14 +43,16 @@ public class Block {
 		long duration = System.currentTimeMillis() - miningStart;
 		System.out.println("Block mined. Duration: " + duration + "ms. Hash: " + hash);
 	}
-	
-	// Add transactions to this block
+
+	// Add transaction to this block, returns true if transaction is successfully
+	// added
 	public boolean addTransaction(Transaction transaction) {
-		// Process transaction and check if valid, unless block is genesis (first) block then ignore
+		// Process transaction and check if valid, unless block is genesis (first) block
+		// then ignore
 		if (transaction == null) {
 			return false;
 		}
-		
+
 		if (previousHash != "0") {
 			if (transaction.processTransaction() != true) {
 				System.out.println("Transaction failed to process. Discarded.");
@@ -62,13 +64,17 @@ public class Block {
 		System.out.println("Transaction successfully added to block.");
 		return true;
 	}
-	
+
 	public String getHash() {
 		return hash;
 	}
 
 	public String getPreviousHash() {
 		return previousHash;
+	}
+
+	public List<Transaction> getTransactions() {
+		return transactions;
 	}
 
 }

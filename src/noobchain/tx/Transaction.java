@@ -12,7 +12,7 @@ public class Transaction {
 
 	private String id; // this is also the hash of the transaction.
 	private PublicKey sender; // senders address/public key.
-	private PublicKey reciepient; // Recipients address/public key.
+	private PublicKey recipient; // Recipients address/public key.
 	private float value;
 	private byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
 
@@ -24,21 +24,21 @@ public class Transaction {
 	// Constructor:
 	public Transaction(PublicKey from, PublicKey to, float value, List<TransactionInput> inputs) {
 		this.sender = from;
-		this.reciepient = to;
+		this.recipient = to;
 		this.value = value;
 		this.inputs = inputs;
 	}
 
 	// Signs all the data we don't wish to be tampered with.
 	public void generateSignature(PrivateKey privateKey) {
-		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient)
+		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient)
 				+ Float.toString(value);
 		signature = StringUtil.applyECDSASig(privateKey, data);
 	}
 
 	// Verifies the data we signed hasn't been tampered with
 	public boolean verifiySignature() {
-		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient)
+		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient)
 				+ Float.toString(value);
 		return StringUtil.verifyECDSASig(sender, data, signature);
 	}
@@ -46,7 +46,7 @@ public class Transaction {
 	// Calculates the transaction hash (which will be used as its id)
 	private String calulateHash() {
 		sequence++; // increase the sequence to avoid 2 identical transactions having the same hash
-		return StringUtil.applySha256(StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient)
+		return StringUtil.applySha256(StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient)
 				+ Float.toString(value) + sequence);
 	}
 
@@ -62,13 +62,19 @@ public class Transaction {
 			i.setUTXO(NoobChain.getUTXOs().get(i.getTransactionOutputId()));
 		}
 
+		// Check if transaction is valid
+		if (getInputsValue() < NoobChain.getMinimumTransaction()) {
+			System.out.println("Transaction inputs is too small: " + getInputsValue());
+			return false;
+		}
+
 		// Generate transaction outputs
 		// Get value of inputs then the left over change
 		float leftOver = getInputsValue() - value;
 		id = calulateHash();
 
 		// Send value to recipient
-		outputs.add(new TransactionOutput(this.reciepient, value, id));
+		outputs.add(new TransactionOutput(this.recipient, value, id));
 
 		// Send the left over 'change' back to sender
 		outputs.add(new TransactionOutput(this.sender, leftOver, id));
@@ -112,6 +118,30 @@ public class Transaction {
 
 	public String getId() {
 		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public List<TransactionInput> getInputs() {
+		return inputs;
+	}
+
+	public List<TransactionOutput> getOutputs() {
+		return outputs;
+	}
+
+	public PublicKey getRecipient() {
+		return recipient;
+	}
+
+	public PublicKey getSender() {
+		return sender;
+	}
+
+	public float getValue() {
+		return value;
 	}
 
 }
