@@ -66,7 +66,7 @@ public class Transaction {
 		// Get value of inputs then the left over change
 		float leftOver = getInputsValue() - value;
 		id = calulateHash();
-		
+
 		// Send value to recipient
 		outputs.add(new TransactionOutput(this.reciepient, value, id));
 
@@ -108,6 +108,10 @@ public class Transaction {
 			total += output.getValue();
 		}
 		return total;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 }
