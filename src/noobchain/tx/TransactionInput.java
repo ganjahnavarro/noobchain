@@ -21,6 +21,10 @@ public class TransactionInput {
 		return UTXO;
 	}
 
+	public void setUTXO(TransactionOutput uTXO) {
+		UTXO = uTXO;
+	}
+
 	public String getTransactionOutputId() {
 		return transactionOutputId;
 	}
